@@ -33,3 +33,29 @@ resource "aws_subnet" "subnet_public" {
 }
 
 
+//private subnet
+resource "aws_subnet" "subnet_private" {
+  vpc_id = aws_vpc.main.id
+  count  = length(var.private_subnet_cidr_list)
+  //cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index + 4)
+
+  cidr_block        = var.private_subnet_cidr_list[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+
+
+  tags = {
+    Name = "${var.assignment} - Private Subnet - ${count.index + 1}"
+  }
+}
+
+//internet gateway
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.assignment} - internet gateway"
+  }
+}
+
+
+

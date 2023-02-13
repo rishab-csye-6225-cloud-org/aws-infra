@@ -28,3 +28,21 @@ variable "state" {
   description = "the state of the availability zone"
 
 }
+
+variable "internet_gateway_cidr" {
+  type        = string
+  description = "internet gateway cidr range"
+
+}
+
+variable "public_subnet_cidr_list" {
+  type        = list(any)
+  description = "a list of all public subnet cidr values"
+}
+
+
+variable "private_subnet_cidr_list" {
+  type        = list(any)
+  description = "a list of all private subnet cidr values"
+
+}
