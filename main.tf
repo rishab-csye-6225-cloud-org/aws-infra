@@ -58,4 +58,45 @@ resource "aws_internet_gateway" "gw" {
 }
 
 
+//public route table
+resource "aws_route_table" "public_route_table" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = var.internet_gateway_cidr
+    gateway_id = aws_internet_gateway.gw.id
+  }
+
+  tags = {
+    Name = "${var.assignment} - public route table"
+  }
+}
+
+
+//public subnet association
+resource "aws_route_table_association" "public_subnet_association" {
+  count          = length(var.public_subnet_cidr_list)
+  subnet_id      = aws_subnet.subnet_public[count.index].id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
+//private route table
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.assignment} - private route table"
+  }
+}
+
+
+//private subnet association
+resource "aws_route_table_association" "private_subnet_association" {
+  count = length(var.private_subnet_cidr_list)
+
+  subnet_id      = aws_subnet.subnet_private[count.index].id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
+
 
