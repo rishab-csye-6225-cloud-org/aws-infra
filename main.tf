@@ -23,7 +23,7 @@ resource "aws_subnet" "subnet_public" {
   cidr_block = var.public_subnet_cidr_list[count.index]
   // cidr_block              = cidrsubnet(var.vpc_cidr, 8, count.index + 1)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = var.map_public_ip
 
 
   tags = {
