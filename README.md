@@ -17,11 +17,11 @@
 
 1. Clone the organization's (rishab-csye-6225-cloud-org)  aws-infra (main) repository
 2. Go to the aws-infra folder first 
+    - Add the dev.tfvars or demo.tfvars file (with all the variables defined) in the root directory
     - terraform init
-    - Add the dev.tfvars file (with all the variables) in the root directory
-    - terraform plan -var-file="dev.tfvars"
-    - terraform apply -var-file="dev.tfvars"
-    - terraform destroy -var-file="dev.tfvars"
+    - terraform plan -var-file="file_name.tfvars"
+    - terraform apply -var-file="file_name.tfvars"
+    - terraform destroy -var-file="file_name.tfvars"
 
 
 ## Steps followed for the assignment were as follows:
