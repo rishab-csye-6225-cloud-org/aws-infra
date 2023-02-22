@@ -61,3 +61,25 @@ variable "map_public_ip" {
   default     = true
 
 }
+
+variable "ami_image_id" {
+  type        = string
+  description = "ami image id"
+
+}
+
+
+variable "app_port" {
+  type        = number
+  description = "application port"
+  default     = 9001
+
+}
+
+
+variable "ssh_key_name" {
+  type        = string
+  description = "ssh key name"
+  default     = "xxx"
+
+}

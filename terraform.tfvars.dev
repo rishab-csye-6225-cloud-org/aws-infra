@@ -7,3 +7,6 @@ internet_gateway_cidr    = "0.0.0.0/0"
 public_subnet_cidr_list  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
 private_subnet_cidr_list = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
 map_public_ip            = true
+ami_image_id             = "ami-00bbe66ee8095d7a6"
+app_port                 = 9000
+ssh_key_name             = "ec2"
