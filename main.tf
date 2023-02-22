@@ -95,5 +95,72 @@ resource "aws_route_table_association" "private_subnet_association" {
   route_table_id = aws_route_table.private_route_table.id
 }
 
+//security group for ec2 instance
+resource "aws_security_group" "application_security_group" {
+  name        = "application security group"
+  description = "Allow TCP protocol inbound/ingress traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "TCP traffic to port 443"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "TCP traffic to port 80"
+    to_port     = 80
+    from_port   = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "TCP traffic to port 22"
+    to_port     = 22
+    from_port   = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "TCP traffic to port anywhere"
+    to_port     = var.app_port
+    from_port   = var.app_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.assignment} - application security group"
+  }
+}
 
 
+//ec2 instance
+resource "aws_instance" "web" {
+  ami                         = var.ami_image_id
+  instance_type               = "t2.micro"
+  associate_public_ip_address = true
+  key_name                    = var.ssh_key_name
+
+  subnet_id = aws_subnet.subnet_public[0].id //giving a public subnet Id
+
+  disable_api_termination = false
+  root_block_device {
+    delete_on_termination = true
+    volume_size           = 50
+    volume_type           = "gp2"
+  }
+
+  vpc_security_group_ids = [
+    aws_security_group.application_security_group.id,
+  ]
+
+
+  tags = {
+    Name = "${var.assignment} -  Ec2 Instance "
+  }
+}
