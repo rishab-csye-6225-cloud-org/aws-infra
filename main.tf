@@ -141,22 +141,22 @@ resource "aws_security_group" "application_security_group" {
 
 //ec2 instance
 resource "aws_instance" "web" {
-  ami           = var.ami_image_id
-  instance_type = "t2.micro"
+  ami                         = var.ami_image_id
+  instance_type               = "t2.micro"
   associate_public_ip_address = true
-  key_name = var.ssh_key_name
+  key_name                    = var.ssh_key_name
 
- subnet_id      = aws_subnet.subnet_public[0].id  //giving a public subnet Id
+  subnet_id = aws_subnet.subnet_public[0].id //giving a public subnet Id
 
-  disable_api_termination = false  
+  disable_api_termination = false
   root_block_device {
     delete_on_termination = true
-    volume_size = 50
-    volume_type = "gp2"
+    volume_size           = 50
+    volume_type           = "gp2"
   }
 
   vpc_security_group_ids = [
-    aws_security_group.application_security_group.id ,
+    aws_security_group.application_security_group.id,
   ]
 
 
