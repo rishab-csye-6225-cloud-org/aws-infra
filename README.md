@@ -33,3 +33,29 @@
 6. Also created .tf file for variable declaration and created .tfvars file to define those declared variables in the .tf variable files
 7. Added necessary terraform files like state and lock files to be ignored in the .gitignore file.
 
+
+
+# Assignment 4
+
+## The assignment was to build Infrastructure for the AWS which includes VPC, Subnets - Public and Private, Route tables, Internet gateway,etc 
+
+## We need to create Ec2 instance and attacn an ami, ebs and other specs as per the requirement.
+
+
+## Instructions to run the Assignment
+
+1. Clone the organization's (rishab-csye-6225-cloud-org)  aws-infra (main) repository
+2. Go to the aws-infra folder first 
+    - Add the dev.tfvars or demo.tfvars file (with all the variables defined) in the root directory
+    - terraform init
+    - terraform plan -var-file="file_name.tfvars"
+    - terraform apply -var-file="file_name.tfvars"
+    - terraform destroy -var-file="file_name.tfvars"
+
+
+## Steps followed for the assignment were as follows:
+1. Read the terraform documentation in order to write the code to create infrastructure
+2. Worked in the dev profile in order to develop the code
+3. Ran the terraform commands to run the code
+6. Created ec2 and security groups using terraform
+7. Used demo as a profile to launch the ami
