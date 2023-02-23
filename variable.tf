@@ -62,12 +62,6 @@ variable "map_public_ip" {
 
 }
 
-variable "ami_image_id" {
-  type        = string
-  description = "ami image id"
-
-}
-
 
 variable "app_port" {
   type        = number
@@ -81,5 +75,12 @@ variable "ssh_key_name" {
   type        = string
   description = "ssh key name"
   default     = "xxx"
+
+}
+
+variable "ami_owners" {
+  type        = list(string)
+  description = "a list of all private subnet cidr values"
+  default     = ["xxx"]
 
 }
