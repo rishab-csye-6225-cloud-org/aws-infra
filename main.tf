@@ -139,9 +139,21 @@ resource "aws_security_group" "application_security_group" {
 }
 
 
+data "aws_ami" "ami_image" {
+  executable_users = ["self"]
+  most_recent      = true
+  owners           = var.ami_owners
+
+  filter {
+    name   = "name"
+    values = ["csye6225_*"]
+  }
+}
+
+
 //ec2 instance
 resource "aws_instance" "web" {
-  ami                         = var.ami_image_id
+  ami                         = data.aws_ami.ami_image.id
   instance_type               = "t2.micro"
   associate_public_ip_address = true
   key_name                    = var.ssh_key_name
