@@ -304,19 +304,17 @@ resource "aws_s3_bucket_acl" "s3_acl" {
   acl    = "private"
 }
 
-//sse encrytion
-resource "aws_kms_key" "mykey" {
-  description             = "This key is used to encrypt bucket objects"
-  deletion_window_in_days = 10
-}
+# //sse encrytion
+# resource "aws_kms_key" "mykey" {
+#   description             = "This key is used to encrypt bucket objects"
+#   deletion_window_in_days = 10
+# }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "s3_key_encryption" {
   bucket = aws_s3_bucket.aws_s3_bucket.id
-
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.mykey.arn
-      sse_algorithm     = "aws:kms"
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -336,14 +334,14 @@ resource "aws_iam_policy" "iam_policy_s3_access" {
   description = "Provides permission to access S3"
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
         Action = [
           "s3:ListAllMyBuckets",
           "s3:GetObject",
           "s3:PutObject",
-          "s3:deleteObject",
+          "s3:DeleteObject"
         ]
         Effect = "Allow"
         Resource = [
