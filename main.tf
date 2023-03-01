@@ -135,10 +135,9 @@ resource "aws_security_group" "application_security_group" {
 
   //for testing purpose
   egress {
-    description = "TCP traffic to DB PORT anywhere"
-    to_port     = 5432
-    from_port   = 5432
-    protocol    = "tcp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -199,10 +198,12 @@ resource "aws_instance" "web" {
                       echo "DB_USER=csye6225" >> .env
                       echo "DB_NAME=csye6225" >> .env
                       echo "DB_PORT=5432" >> .env
-                      echo "APP_PORT=9000" >> .env
+                      echo "APP_PORT=${var.app_port}" >> .env
                       echo "DB_HOSTNAME=${aws_db_instance.rds_db_instance.address}" >> .env
                       echo "DB_PASSWORD=${var.db_password}" >> .env
-                    
+                      echo "AWS_BUCKET_NAME=${aws_s3_bucket.aws_s3_bucket.bucket}" >> .env
+
+
                       sudo systemctl start webapp
                       sudo systemctl status webapp
                       sudo systemctl enable webapp
@@ -227,12 +228,12 @@ resource "aws_security_group" "database_security_group" {
     security_groups = [aws_security_group.application_security_group.id]
   }
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # ingress {
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 }
 
 
@@ -272,6 +273,7 @@ resource "aws_db_subnet_group" "private_subnet_group" {
 //s3 
 resource "aws_s3_bucket" "aws_s3_bucket" {
   bucket = "${random_string.s3_bucket_name.id}.${var.profile}"
+  //bucket = "csye6225.rishab.05"
 
 
   tags = {
@@ -314,7 +316,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "s3_key_encryption
   bucket = aws_s3_bucket.aws_s3_bucket.id
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm = "aws:kms"
     }
   }
 }
@@ -334,14 +336,15 @@ resource "aws_iam_policy" "iam_policy_s3_access" {
   description = "Provides permission to access S3"
 
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
         Action = [
           "s3:ListAllMyBuckets",
           "s3:GetObject",
           "s3:PutObject",
-          "s3:DeleteObject"
+          "s3:DeleteObject",
+          "s3:GetBucketLocation",
         ]
         Effect = "Allow"
         Resource = [
@@ -350,6 +353,27 @@ resource "aws_iam_policy" "iam_policy_s3_access" {
       },
     ]
   })
+
+
+
+  # policy = jsonencode({
+  #   Version = "2012-10-17",
+  #   Statement = [
+  #     {
+  #       Action = [
+  #         "s3:ListAllMyBuckets",
+  #         "s3:GetObject",
+  #         "s3:PutObject",
+  #         "s3:DeleteObject",
+  #         "s3:GetBucketLocation",
+  #       ]
+  #       Effect = "Allow"
+  #       Resource = [
+  #         "arn:aws:s3:::${aws_s3_bucket.aws_s3_bucket.id}",
+  #       "arn:aws:s3:::${aws_s3_bucket.aws_s3_bucket.id}/*"]
+  #     },
+  #   ]
+  # })
 }
 
 
