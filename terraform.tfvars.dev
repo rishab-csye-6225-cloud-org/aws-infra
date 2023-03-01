@@ -1,7 +1,7 @@
 region                   = "us-east-1"
-profile                  = "dev"
+profile                  = "prod"
 vpc_cidr                 = "10.0.0.0/16"
-assignment               = "Assignment-3"
+assignment               = "Assignment-5"
 state                    = "available"
 internet_gateway_cidr    = "0.0.0.0/0"
 public_subnet_cidr_list  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
@@ -10,3 +10,4 @@ map_public_ip            = true
 app_port                 = 9000
 ssh_key_name             = "ec2"
 ami_owners               = ["059217636044"]
+db_password              = "Rishab16"

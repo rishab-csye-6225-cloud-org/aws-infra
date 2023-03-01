@@ -84,3 +84,12 @@ variable "ami_owners" {
   default     = ["xxx"]
 
 }
+
+
+
+variable "db_password" {
+  type        = string
+  description = "database password"
+  default     = ""
+}
+

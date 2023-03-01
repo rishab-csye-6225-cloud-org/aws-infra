@@ -133,6 +133,15 @@ resource "aws_security_group" "application_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  //for testing purpose
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
   tags = {
     Name = "${var.assignment} - application security group"
   }
@@ -151,7 +160,7 @@ data "aws_ami" "ami_image" {
 }
 
 
-//ec2 instance
+# //ec2 instance
 resource "aws_instance" "web" {
   ami                         = data.aws_ami.ami_image.id
   instance_type               = "t2.micro"
@@ -171,8 +180,232 @@ resource "aws_instance" "web" {
     aws_security_group.application_security_group.id,
   ]
 
+  iam_instance_profile = aws_iam_instance_profile.ec2_role_profile.name
+
+  //user data script
+  user_data = <<EOF
+    #!/bin/bash
+                      
+                      ####################################################
+                      
+                      # Configuring Ec2 user data script #
+                      
+                      ####################################################
+                      
+                      cd /home/ec2-user/webapp
+                      touch .env
+                      
+                      echo "DB_USER=csye6225" >> .env
+                      echo "DB_NAME=csye6225" >> .env
+                      echo "DB_PORT=5432" >> .env
+                      echo "APP_PORT=${var.app_port}" >> .env
+                      echo "DB_HOSTNAME=${aws_db_instance.rds_db_instance.address}" >> .env
+                      echo "DB_PASSWORD=${var.db_password}" >> .env
+                      echo "AWS_BUCKET_NAME=${aws_s3_bucket.aws_s3_bucket.bucket}" >> .env
+
+
+                      sudo systemctl start webapp
+                      sudo systemctl status webapp
+                      sudo systemctl enable webapp
+EOF
+
 
   tags = {
     Name = "${var.assignment} -  Ec2 Instance "
   }
 }
+
+
+//security group for rds instance
+resource "aws_security_group" "database_security_group" {
+  name   = "database"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.application_security_group.id]
+  }
+
+  # ingress {
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
+}
+
+
+resource "aws_db_parameter_group" "postgres_parameter_group" {
+  name   = "postgres-pg"
+  family = "postgres14"
+}
+
+resource "aws_db_instance" "rds_db_instance" {
+  allocated_storage      = 10
+  identifier             = "csye6225"
+  db_name                = "csye6225"
+  engine                 = "postgres"
+  engine_version         = "14.6"
+  instance_class         = "db.t3.micro"
+  username               = "csye6225"
+  password               = var.db_password
+  parameter_group_name   = aws_db_parameter_group.postgres_parameter_group.name
+  multi_az               = false
+  publicly_accessible    = false //now as per req
+  db_subnet_group_name   = aws_db_subnet_group.private_subnet_group.name
+  skip_final_snapshot    = true
+  vpc_security_group_ids = [aws_security_group.database_security_group.id]
+
+}
+
+resource "aws_db_subnet_group" "private_subnet_group" {
+  name       = "rds_private_subnet_group"
+  subnet_ids = [aws_subnet.subnet_private[0].id, aws_subnet.subnet_private[1].id]
+
+  tags = {
+    Name = "RDS subnet group"
+  }
+}
+
+
+//s3 
+resource "aws_s3_bucket" "aws_s3_bucket" {
+  bucket = "${random_string.s3_bucket_name.id}.${var.profile}"
+  //bucket = "csye6225.rishab.05"
+
+
+  tags = {
+    Name = "${var.assignment} - S3 bucket"
+  }
+
+}
+
+
+resource "aws_s3_bucket_lifecycle_configuration" "s3_lifecycle_config" {
+  bucket = aws_s3_bucket.aws_s3_bucket.id
+
+  rule {
+
+    id = "lifecycle"
+    filter {}
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA" # or "ONEZONE_IA"
+    }
+
+
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_acl" "s3_acl" {
+  bucket = aws_s3_bucket.aws_s3_bucket.id
+  acl    = "private"
+}
+
+# //sse encrytion
+# resource "aws_kms_key" "mykey" {
+#   description             = "This key is used to encrypt bucket objects"
+#   deletion_window_in_days = 10
+# }
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "s3_key_encryption" {
+  bucket = aws_s3_bucket.aws_s3_bucket.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "aws:kms"
+    }
+  }
+}
+
+//to generate random string
+resource "random_string" "s3_bucket_name" {
+  upper   = false
+  lower   = true
+  special = false
+  length  = 3
+}
+
+//s3 bucket policy
+#Create an IAM Policy
+resource "aws_iam_policy" "iam_policy_s3_access" {
+  name        = "WebAppS3"
+  description = "Provides permission to access S3"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:ListAllMyBuckets",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:GetBucketLocation",
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:s3:::${aws_s3_bucket.aws_s3_bucket.id}",
+        "arn:aws:s3:::${aws_s3_bucket.aws_s3_bucket.id}/*"]
+      },
+    ]
+  })
+
+
+
+  # policy = jsonencode({
+  #   Version = "2012-10-17",
+  #   Statement = [
+  #     {
+  #       Action = [
+  #         "s3:ListAllMyBuckets",
+  #         "s3:GetObject",
+  #         "s3:PutObject",
+  #         "s3:DeleteObject",
+  #         "s3:GetBucketLocation",
+  #       ]
+  #       Effect = "Allow"
+  #       Resource = [
+  #         "arn:aws:s3:::${aws_s3_bucket.aws_s3_bucket.id}",
+  #       "arn:aws:s3:::${aws_s3_bucket.aws_s3_bucket.id}/*"]
+  #     },
+  #   ]
+  # })
+}
+
+
+//creating an iam role for ec2 instance
+resource "aws_iam_role" "ec2_role" {
+  name = "EC2-CSYE6225"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = "RoleForEC2"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+//attaching the policy to role
+resource "aws_iam_policy_attachment" "policy_role_attach" {
+  name       = "policy_role_attach"
+  roles      = [aws_iam_role.ec2_role.name]
+  policy_arn = aws_iam_policy.iam_policy_s3_access.arn
+}
+
+//need to create an instance profile for ec2 role as it acts as a container for the created role
+resource "aws_iam_instance_profile" "ec2_role_profile" {
+  name = "ec2_role_profile"
+  role = aws_iam_role.ec2_role.name
+}
+
