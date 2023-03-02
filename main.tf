@@ -227,13 +227,6 @@ resource "aws_security_group" "database_security_group" {
     protocol        = "tcp"
     security_groups = [aws_security_group.application_security_group.id]
   }
-
-  # ingress {
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
 }
 
 
@@ -269,12 +262,10 @@ resource "aws_db_subnet_group" "private_subnet_group" {
   }
 }
 
-
 //s3 
 resource "aws_s3_bucket" "aws_s3_bucket" {
-  bucket = "${random_string.s3_bucket_name.id}.${var.profile}"
-  //bucket = "csye6225.rishab.05"
-
+  bucket        = "${random_string.s3_bucket_name.id}.${var.profile}"
+  force_destroy = true
 
   tags = {
     Name = "${var.assignment} - S3 bucket"
@@ -306,17 +297,13 @@ resource "aws_s3_bucket_acl" "s3_acl" {
   acl    = "private"
 }
 
-# //sse encrytion
-# resource "aws_kms_key" "mykey" {
-#   description             = "This key is used to encrypt bucket objects"
-#   deletion_window_in_days = 10
-# }
+
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "s3_key_encryption" {
   bucket = aws_s3_bucket.aws_s3_bucket.id
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms"
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -354,26 +341,6 @@ resource "aws_iam_policy" "iam_policy_s3_access" {
     ]
   })
 
-
-
-  # policy = jsonencode({
-  #   Version = "2012-10-17",
-  #   Statement = [
-  #     {
-  #       Action = [
-  #         "s3:ListAllMyBuckets",
-  #         "s3:GetObject",
-  #         "s3:PutObject",
-  #         "s3:DeleteObject",
-  #         "s3:GetBucketLocation",
-  #       ]
-  #       Effect = "Allow"
-  #       Resource = [
-  #         "arn:aws:s3:::${aws_s3_bucket.aws_s3_bucket.id}",
-  #       "arn:aws:s3:::${aws_s3_bucket.aws_s3_bucket.id}/*"]
-  #     },
-  #   ]
-  # })
 }
 
 
