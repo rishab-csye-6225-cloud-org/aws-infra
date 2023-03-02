@@ -13,3 +13,6 @@ ami_owners               = ["059217636044"]
 db_password              = "Rishab16"
 db_name                  = "csye6225"
 db_user                  = "csye6225"
+db_storage_size          = 10
+db_engine                = "postgres"
+db_engine_version        = "14.6"

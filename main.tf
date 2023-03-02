@@ -97,7 +97,7 @@ resource "aws_route_table_association" "private_subnet_association" {
 
 //security group for ec2 instance
 resource "aws_security_group" "application_security_group" {
-  name        = "application security group"
+  name        = "application"
   description = "Allow TCP protocol inbound/ingress traffic"
   vpc_id      = aws_vpc.main.id
 
@@ -197,7 +197,7 @@ resource "aws_instance" "web" {
                       
                       echo "DB_USER=${var.db_user}" >> .env
                       echo "DB_NAME=${var.db_name}" >> .env
-                      echo "DB_PORT=5432" >> .env
+                      echo "DB_PORT=${aws_db_instance.rds_db_instance.port}" >> .env
                       echo "APP_PORT=${var.app_port}" >> .env
                       echo "DB_HOSTNAME=${aws_db_instance.rds_db_instance.address}" >> .env
                       echo "DB_PASSWORD=${var.db_password}" >> .env
@@ -236,11 +236,11 @@ resource "aws_db_parameter_group" "postgres_parameter_group" {
 }
 
 resource "aws_db_instance" "rds_db_instance" {
-  allocated_storage      = 10
+  allocated_storage      = var.db_storage_size
   identifier             = "csye6225"
   db_name                = var.db_name
-  engine                 = "postgres"
-  engine_version         = "14.6"
+  engine                 = var.db_engine
+  engine_version         = var.db_engine_version
   instance_class         = "db.t3.micro"
   username               = var.db_user
   password               = var.db_password
@@ -255,7 +255,7 @@ resource "aws_db_instance" "rds_db_instance" {
 
 resource "aws_db_subnet_group" "private_subnet_group" {
   name       = "rds_private_subnet_group"
-  subnet_ids = [aws_subnet.subnet_private[0].id, aws_subnet.subnet_private[1].id]
+  subnet_ids = [aws_subnet.subnet_private[0].id, aws_subnet.subnet_private[1].id, aws_subnet.subnet_private[2].id ]
 
   tags = {
     Name = "RDS subnet group"
@@ -312,7 +312,7 @@ resource "random_string" "s3_bucket_name" {
   upper   = false
   lower   = true
   special = false
-  length  = 3
+  length  = 5
 }
 
 //s3 bucket policy

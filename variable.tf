@@ -104,3 +104,20 @@ variable "db_user" {
   description = "database user name"
   default     = ""
 }
+
+variable "db_storage_size" {
+  description = "Db storage size"
+  type        = number
+  default     = 20
+}
+
+variable "db_engine" {
+  description = "DB engine for RDS"
+  default     = "postgres"
+}
+
+
+variable "db_engine_version" {
+  description = "DB engine version for RDS"
+  default     = "14.6"
+}
