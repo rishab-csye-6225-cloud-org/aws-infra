@@ -96,13 +96,13 @@ variable "db_password" {
 variable "db_name" {
   type        = string
   description = "database name"
-  default     = ""
+  default     = "dbname"
 }
 
 variable "db_user" {
   type        = string
   description = "database user name"
-  default     = ""
+  default     = "csye6225"
 }
 
 variable "db_storage_size" {
