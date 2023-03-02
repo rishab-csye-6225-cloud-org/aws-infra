@@ -1,5 +1,5 @@
 region                   = "us-east-1"
-profile                  = "prod"
+profile                  = "dev"
 vpc_cidr                 = "10.0.0.0/16"
 assignment               = "Assignment-5"
 state                    = "available"
@@ -11,3 +11,5 @@ app_port                 = 9000
 ssh_key_name             = "ec2"
 ami_owners               = ["059217636044"]
 db_password              = "Rishab16"
+db_name                  = "csye6225"
+db_user                  = "csye6225"

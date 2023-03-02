@@ -195,8 +195,8 @@ resource "aws_instance" "web" {
                       cd /home/ec2-user/webapp
                       touch .env
                       
-                      echo "DB_USER=csye6225" >> .env
-                      echo "DB_NAME=csye6225" >> .env
+                      echo "DB_USER=${var.db_user}" >> .env
+                      echo "DB_NAME=${var.db_name}" >> .env
                       echo "DB_PORT=5432" >> .env
                       echo "APP_PORT=${var.app_port}" >> .env
                       echo "DB_HOSTNAME=${aws_db_instance.rds_db_instance.address}" >> .env
@@ -238,11 +238,11 @@ resource "aws_db_parameter_group" "postgres_parameter_group" {
 resource "aws_db_instance" "rds_db_instance" {
   allocated_storage      = 10
   identifier             = "csye6225"
-  db_name                = "csye6225"
+  db_name                = var.db_name
   engine                 = "postgres"
   engine_version         = "14.6"
   instance_class         = "db.t3.micro"
-  username               = "csye6225"
+  username               = var.db_user
   password               = var.db_password
   parameter_group_name   = aws_db_parameter_group.postgres_parameter_group.name
   multi_az               = false
@@ -287,7 +287,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_lifecycle_config" {
       storage_class = "STANDARD_IA" # or "ONEZONE_IA"
     }
 
-
     status = "Enabled"
   }
 }
@@ -331,7 +330,6 @@ resource "aws_iam_policy" "iam_policy_s3_access" {
           "s3:GetObject",
           "s3:PutObject",
           "s3:DeleteObject",
-          "s3:GetBucketLocation",
         ]
         Effect = "Allow"
         Resource = [
