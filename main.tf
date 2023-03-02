@@ -255,7 +255,7 @@ resource "aws_db_instance" "rds_db_instance" {
 
 resource "aws_db_subnet_group" "private_subnet_group" {
   name       = "rds_private_subnet_group"
-  subnet_ids = [aws_subnet.subnet_private[0].id, aws_subnet.subnet_private[1].id, aws_subnet.subnet_private[2].id ]
+  subnet_ids = [aws_subnet.subnet_private[0].id, aws_subnet.subnet_private[1].id, aws_subnet.subnet_private[2].id]
 
   tags = {
     Name = "RDS subnet group"
