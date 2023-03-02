@@ -93,3 +93,14 @@ variable "db_password" {
   default     = ""
 }
 
+variable "db_name" {
+  type        = string
+  description = "database name"
+  default     = ""
+}
+
+variable "db_user" {
+  type        = string
+  description = "database user name"
+  default     = ""
+}
