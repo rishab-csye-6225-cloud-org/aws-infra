@@ -326,7 +326,6 @@ resource "aws_iam_policy" "iam_policy_s3_access" {
     Statement = [
       {
         Action = [
-          "s3:ListAllMyBuckets",
           "s3:GetObject",
           "s3:PutObject",
           "s3:DeleteObject",
@@ -374,3 +373,18 @@ resource "aws_iam_instance_profile" "ec2_role_profile" {
   role = aws_iam_role.ec2_role.name
 }
 
+//AWS Route 53 zone data source
+data "aws_route53_zone" "selected" {
+  name         = var.domain_name
+  private_zone = false
+}
+
+//AWS Route 53 record
+resource "aws_route53_record" "server_mapping_record" {
+  //zone_id = var.zone_id
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = var.domain_name
+  type    = "A"
+  ttl     = "60"
+  records = [aws_instance.web.public_ip]
+}
