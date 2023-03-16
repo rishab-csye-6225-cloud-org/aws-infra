@@ -17,3 +17,5 @@ db_storage_size          = 10
 db_engine                = "postgres"
 db_engine_version        = "14.6"
 domain_name              = "prod.rishabagarwal.me"
+record_type              = "A"
+ttl_value                = "60"

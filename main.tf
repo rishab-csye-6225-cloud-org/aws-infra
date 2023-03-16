@@ -373,6 +373,16 @@ resource "aws_iam_instance_profile" "ec2_role_profile" {
   role = aws_iam_role.ec2_role.name
 }
 
+//public access block
+resource "aws_s3_bucket_public_access_block" "s3_bucket_public_access_block" {
+  bucket     = aws_s3_bucket.aws_s3_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 //AWS Route 53 zone data source
 data "aws_route53_zone" "selected_zone" {
   name         = var.domain_name
@@ -384,7 +394,8 @@ resource "aws_route53_record" "server_mapping_record" {
   //zone_id = var.zone_id
   zone_id = data.aws_route53_zone.selected_zone.zone_id
   name    = var.domain_name
-  type    = "A"
-  ttl     = "60"
+  type    = var.record_type
+  ttl     = var.ttl_value
   records = [aws_instance.web.public_ip]
 }
+

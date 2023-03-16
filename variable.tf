@@ -137,3 +137,15 @@ variable "domain_name" {
   default     = "xxxx"
 }
 
+variable "record_type" {
+  description = "record type"
+  type        = string
+  default     = "xxxx"
+}
+
+variable "ttl_value" {
+  description = "ttl value"
+  type        = string
+  default     = "xxxx"
+}
+
