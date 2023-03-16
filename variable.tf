@@ -113,11 +113,27 @@ variable "db_storage_size" {
 
 variable "db_engine" {
   description = "DB engine for RDS"
+  type        = string
   default     = "postgres"
 }
 
 
 variable "db_engine_version" {
   description = "DB engine version for RDS"
+  type        = string
   default     = "14.6"
 }
+
+
+# variable "zone_id" {
+#   description = "Zone id"
+#   type        = string
+#   default     = "xxxx"
+# }
+
+variable "domain_name" {
+  description = "Domain name"
+  type        = string
+  default     = "xxxx"
+}
+
