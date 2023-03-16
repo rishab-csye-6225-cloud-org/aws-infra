@@ -375,7 +375,7 @@ resource "aws_iam_instance_profile" "ec2_role_profile" {
 
 //public access block
 resource "aws_s3_bucket_public_access_block" "s3_bucket_public_access_block" {
-  bucket     = aws_s3_bucket.aws_s3_bucket.id
+  bucket = aws_s3_bucket.aws_s3_bucket.id
 
   block_public_acls       = true
   block_public_policy     = true
