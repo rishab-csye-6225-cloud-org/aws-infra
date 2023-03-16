@@ -59,3 +59,27 @@
 3. Ran the terraform commands to run the code
 6. Created ec2 and security groups using terraform
 7. Used demo as a profile to launch the ami
+
+
+# Assignment 6
+
+## The assignment was to configure Amazon Route 53 For DNS Service.
+
+## Updated Route53 record in the Terraform template
+
+## Instructions to run the Assignment
+
+1. Clone the organization's (rishab-csye-6225-cloud-org)  aws-infra (main) repository
+2. Go to the aws-infra folder first 
+    - Add the dev.tfvars or demo.tfvars file (with all the variables defined) in the root directory
+    - terraform init
+    - terraform plan -var-file="file_name.tfvars"
+    - terraform apply -var-file="file_name.tfvars"
+    - terraform destroy -var-file="file_name.tfvars"
+
+
+## Steps followed for the assignment were as follows:
+1. Wrote the code to add record of type "A" for route53
+2. Worked in the dev profile in order to develop the code
+3. Ran the terraform commands to run the code
+6. Created the infrastructure and tested the application using the domain name

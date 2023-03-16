@@ -374,7 +374,7 @@ resource "aws_iam_instance_profile" "ec2_role_profile" {
 }
 
 //AWS Route 53 zone data source
-data "aws_route53_zone" "selected" {
+data "aws_route53_zone" "selected_zone" {
   name         = var.domain_name
   private_zone = false
 }
@@ -382,7 +382,7 @@ data "aws_route53_zone" "selected" {
 //AWS Route 53 record
 resource "aws_route53_record" "server_mapping_record" {
   //zone_id = var.zone_id
-  zone_id = data.aws_route53_zone.selected.zone_id
+  zone_id = data.aws_route53_zone.selected_zone.zone_id
   name    = var.domain_name
   type    = "A"
   ttl     = "60"
