@@ -203,10 +203,10 @@ resource "aws_instance" "web" {
                       echo "DB_PASSWORD=${var.db_password}" >> .env
                       echo "AWS_BUCKET_NAME=${aws_s3_bucket.aws_s3_bucket.bucket}" >> .env
 
-
                       sudo systemctl start webapp
                       sudo systemctl status webapp
                       sudo systemctl enable webapp
+                      sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/cloudwatch-config.json -s
 EOF
 
 
@@ -360,12 +360,26 @@ resource "aws_iam_role" "ec2_role" {
   })
 }
 
+# Get the policy by name
+data "aws_iam_policy" "cloudwatch_policy" {
+  name = "CloudWatchAgentServerPolicy"
+}
+
+
 //attaching the policy to role
-resource "aws_iam_policy_attachment" "policy_role_attach" {
+resource "aws_iam_policy_attachment" "policy_role_attach_s3" {
   name       = "policy_role_attach"
   roles      = [aws_iam_role.ec2_role.name]
   policy_arn = aws_iam_policy.iam_policy_s3_access.arn
 }
+
+resource "aws_iam_policy_attachment" "policy_role_attach_cloudwatch" {
+  name       = "policy_role_attach_cloudwatch"
+  roles      = [aws_iam_role.ec2_role.name]
+  policy_arn = data.aws_iam_policy.cloudwatch_policy.arn
+}
+
+
 
 //need to create an instance profile for ec2 role as it acts as a container for the created role
 resource "aws_iam_instance_profile" "ec2_role_profile" {
