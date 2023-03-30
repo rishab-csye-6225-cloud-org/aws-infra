@@ -83,3 +83,29 @@
 2. Worked in the dev profile in order to develop the code
 3. Ran the terraform commands to run the code
 6. Created the infrastructure and tested the application using the domain name
+
+
+# Assignment 7
+
+## The assignment was to download, install and configure cloudwatch agent.
+
+## Need to add policy for Cloudwatch services and attach it to an Ec2 instance role so that Ec2 can access it.
+
+## Instructions to run the Assignment
+
+1. Clone the organization's (rishab-csye-6225-cloud-org)  aws-infra (main) repository
+2. Go to the aws-infra folder first 
+    - Add the dev.tfvars or demo.tfvars file (with all the variables defined) in the root directory
+    - terraform init
+    - terraform plan -var-file="file_name.tfvars"
+    - terraform apply -var-file="file_name.tfvars"
+    - terraform destroy -var-file="file_name.tfvars"
+
+
+## Steps followed for the assignment were as follows:
+1. Wrote the code to add iam policy for Cloudwatch service
+2. Attached the policy to the Ec2 role
+3. Added a command to run the cloudwatch agent in user data script
+4. Worked in the dev profile in order to develop the code
+5. Ran the terraform commands to run the code
+6. Created the infrastructure and tested the application using the domain name
