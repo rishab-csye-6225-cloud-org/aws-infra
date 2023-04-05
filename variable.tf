@@ -149,3 +149,60 @@ variable "ttl_value" {
   default     = "xxxx"
 }
 
+variable "lb_type" {
+  description = "load balancer type"
+  type        = string
+  default     = "xxxx"
+}
+
+variable "asg_max_size" {
+  description = "Auto scaling group max size"
+  type        = number
+  default     = 5
+}
+
+
+variable "asg_min_size" {
+  description = "Auto scaling group min size"
+  type        = number
+  default     = 1
+}
+
+variable "asg_cool_down" {
+  description = "Auto scaling group cool down"
+  type        = number
+  default     = 60
+}
+
+variable "asg_desired_capacity" {
+  description = "Auto scaling group desired capacity"
+  type        = number
+  default     = 2
+}
+
+variable "lb_target_type" {
+  description = "load balancer target type"
+  type        = string
+  default     = "xxxx"
+}
+
+variable "lb_target_type_protocol" {
+  description = "load balancer target type protocol"
+  type        = string
+  default     = "xxxx"
+}
+
+variable "scale_up_policy_threshold" {
+  description = "scale up policy threshold"
+  type        = number
+  default     = 5
+}
+
+variable "scale_down_policy_threshold" {
+  description = "scale down policy threshold"
+  type        = number
+  default     = 1
+}
+
+
+
