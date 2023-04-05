@@ -109,3 +109,32 @@
 4. Worked in the dev profile in order to develop the code
 5. Ran the terraform commands to run the code
 6. Created the infrastructure and tested the application using the domain name
+
+# Assignment 8
+
+## The assignment was to add Ec2 launch template, load balancer & auto scaling group.
+
+## Need to configure the entire infrastructure changes for load balancer, launch template and auto scaling group and its policies.
+
+## Instructions to run the Assignment
+
+1. Clone the organization's (rishab-csye-6225-cloud-org)  aws-infra (main) repository
+2. Go to the aws-infra folder first 
+    - Add the dev.tfvars or demo.tfvars file (with all the variables defined) in the root directory
+    - terraform init
+    - terraform plan -var-file="file_name.tfvars"
+    - terraform apply -var-file="file_name.tfvars"
+    - terraform destroy -var-file="file_name.tfvars"
+
+
+## Steps followed for the assignment were as follows:
+1. Wrote the code to add launch template for EC2 instances
+2. Created a shell script in order to run the user data script and passed it to launch template
+3. Added and updated security groups for Load balancer and Ec2 instances
+4. Removed the resource of Ec2 instance
+5. Configured Auto Scaling group and its policies.
+6. Added cloudwatch alarms which will trigger the scale up and down policies as per the alarm
+7. Made updates in the Route53 by adding alias for Load balancer DNS name
+8. Worked in the dev profile in order to develop the code
+9. Ran the terraform commands to run the code
+10. Created the infrastructure and tested the application using the domain name
