@@ -204,5 +204,9 @@ variable "scale_down_policy_threshold" {
   default     = 1
 }
 
-
+variable "log_group_name" {
+  description = "Log group name"
+  type        = string
+  default     = "xxxx"
+}
 

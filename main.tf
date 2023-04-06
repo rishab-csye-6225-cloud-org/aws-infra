@@ -144,62 +144,6 @@ data "aws_ami" "ami_image" {
 }
 
 
-# //ec2 instance
-# resource "aws_instance" "web" {
-#   ami                         = data.aws_ami.ami_image.id
-#   instance_type               = "t2.micro"
-#   associate_public_ip_address = true
-#   key_name                    = var.ssh_key_name
-
-#   subnet_id = aws_subnet.subnet_public[0].id //giving a public subnet Id
-
-#   disable_api_termination = false
-#   root_block_device {
-#     delete_on_termination = true
-#     volume_size           = 50
-#     volume_type           = "gp2"
-#   }
-
-#   vpc_security_group_ids = [
-#     aws_security_group.application_security_group.id,
-#   ]
-
-#   iam_instance_profile = aws_iam_instance_profile.ec2_role_profile.name
-
-#   //user data script
-#   user_data = <<EOF
-#     #!/bin/bash
-
-#                       ####################################################
-
-#                       # Configuring Ec2 user data script #
-
-#                       ####################################################
-
-#                       cd /home/ec2-user/webapp
-#                       touch .env
-
-#                       echo "DB_USER=${var.db_user}" >> .env
-#                       echo "DB_NAME=${var.db_name}" >> .env
-#                       echo "DB_PORT=${aws_db_instance.rds_db_instance.port}" >> .env
-#                       echo "APP_PORT=${var.app_port}" >> .env
-#                       echo "DB_HOSTNAME=${aws_db_instance.rds_db_instance.address}" >> .env
-#                       echo "DB_PASSWORD=${var.db_password}" >> .env
-#                       echo "AWS_BUCKET_NAME=${aws_s3_bucket.aws_s3_bucket.bucket}" >> .env
-
-#                       sudo systemctl start webapp
-#                       sudo systemctl status webapp
-#                       sudo systemctl enable webapp
-#                       sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/cloudwatch-config.json -s
-# EOF
-
-
-#   tags = {
-#     Name = "${var.assignment} -  Ec2 Instance "
-#   }
-# }
-
-
 //security group for rds instance
 resource "aws_security_group" "database_security_group" {
   name   = "database"
@@ -646,3 +590,6 @@ resource "aws_cloudwatch_metric_alarm" "scale_down_policy_alarm" {
   alarm_actions     = [aws_autoscaling_policy.scale_down_policy.arn]
 }
 
+resource "aws_cloudwatch_log_group" "aws_cloudwatch_log_group_csye6225" {
+  name = var.log_group_name
+}
