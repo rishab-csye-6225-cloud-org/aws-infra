@@ -29,3 +29,7 @@ lb_target_type_protocol  = "HTTP"
 scale_up_policy_threshold= 5
 scale_down_policy_threshold= 3
 log_group_name             = "csye6225"
+policy_evaluation_periods_scale_down  = 2
+policy_period_scale_down              = 120
+policy_evaluation_periods_scale_up = 2
+policy_period_scale_up      = 120
