@@ -551,10 +551,10 @@ resource "aws_autoscaling_policy" "scale_up_policy" {
 resource "aws_cloudwatch_metric_alarm" "scale_up_policy_alarm" {
   alarm_name          = "instance_scale_up_policy_alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 2
+  evaluation_periods  = var.policy_evaluation_periods_scale_up
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = 120
+  period              = var.policy_period_scale_up
   statistic           = "Average"
   threshold           = var.scale_up_policy_threshold
   dimensions = {
@@ -577,10 +577,10 @@ resource "aws_autoscaling_policy" "scale_down_policy" {
 resource "aws_cloudwatch_metric_alarm" "scale_down_policy_alarm" {
   alarm_name          = "instance_scale_down_policy_alarm"
   comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = 2
+  evaluation_periods  = var.policy_evaluation_periods_scale_down
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = 120
+  period              = var.policy_period_scale_down
   statistic           = "Average"
   threshold           = var.scale_down_policy_threshold
   dimensions = {

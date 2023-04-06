@@ -210,3 +210,27 @@ variable "log_group_name" {
   default     = "xxxx"
 }
 
+variable "policy_evaluation_periods_scale_down" {
+  description = "evaluation periods"
+  type        = number
+  default     = 1
+}
+
+variable "policy_period_scale_down" {
+  description = "period"
+  type        = number
+  default     = 60
+}
+
+variable "policy_evaluation_periods_scale_up" {
+  description = "evaluation periods"
+  type        = number
+  default     = 1
+}
+
+variable "policy_period_scale_up" {
+  description = "period"
+  type        = number
+  default     = 60
+}
+
