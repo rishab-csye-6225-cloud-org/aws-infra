@@ -102,15 +102,7 @@ resource "aws_security_group" "application_security_group" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "TCP traffic to port 22"
-    to_port     = 22
-    from_port   = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] //do need to change?
-  }
-
-  ingress {
-    description     = "TCP traffic to port anywhere"
+    description     = "TCP traffic to app port"
     to_port         = var.app_port
     from_port       = var.app_port
     protocol        = "tcp"
