@@ -171,6 +171,9 @@ resource "aws_db_instance" "rds_db_instance" {
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.database_security_group.id]
 
+  storage_encrypted = true
+  kms_key_id        = aws_kms_key.rds_kms_key.arn
+
 }
 
 resource "aws_db_subnet_group" "private_subnet_group" {
@@ -451,6 +454,8 @@ resource "aws_launch_template" "lt" {
       delete_on_termination = true
       volume_size           = 50
       volume_type           = "gp2"
+      encrypted             = true
+      kms_key_id            = aws_kms_key.ebs_kms_key.arn
     }
   }
 
@@ -497,6 +502,170 @@ resource "aws_autoscaling_group" "asg" {
 
 }
 
+// Policy for Ebs volume
+resource "aws_kms_key" "ebs_kms_key" {
+  description              = "Ebs Key"
+  deletion_window_in_days  = 10
+  customer_master_key_spec = "SYMMETRIC_DEFAULT"
+  enable_key_rotation      = true
+  multi_region             = true
+  tags = {
+    Name = "${var.assignment} - EBS KMS Key"
+  }
+
+  policy = <<EOF
+{
+    "Id": "key-for-ebs",
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Enable IAM User Permissions",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::${var.user_account_id}:root"
+            },
+            "Action": "kms:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Allow access for Key Administrators",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::${var.user_account_id}:root"
+            },
+            "Action": [
+                "kms:Create*",
+                "kms:Describe*",
+                "kms:Enable*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Update*",
+                "kms:Revoke*",
+                "kms:Disable*",
+                "kms:Get*",
+                "kms:Delete*",
+                "kms:TagResource",
+                "kms:UntagResource",
+                "kms:ScheduleKeyDeletion",
+                "kms:CancelKeyDeletion"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "Allow use of the key",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::${var.user_account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            },
+            "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "Allow attachment of persistent resources",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::${var.user_account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            },
+            "Action": [
+                "kms:CreateGrant",
+                "kms:ListGrants",
+                "kms:RevokeGrant"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "Bool": {
+                    "kms:GrantIsForAWSResource": "true"
+                }
+            }
+        }
+    ]
+}
+
+EOF
+
+}
+
+#  alias for the Ebs key
+resource "aws_kms_alias" "alias_key_ebs" {
+  name          = "alias/${var.alias_ebs_key}"
+  target_key_id = aws_kms_key.ebs_kms_key.key_id
+}
+
+
+// Policy for Rds 
+resource "aws_kms_key" "rds_kms_key" {
+  description              = "KMS key for EBS encryption"
+  deletion_window_in_days  = 10
+  customer_master_key_spec = "SYMMETRIC_DEFAULT"
+  enable_key_rotation      = true
+  multi_region             = true
+  policy = jsonencode(
+
+    {
+      "Id" : "key-for-rds",
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Sid" : "Enable IAM User Permissions",
+          "Effect" : "Allow",
+          "Principal" : {
+            "AWS" : "arn:aws:iam::${var.user_account_id}:root"
+          },
+          "Action" : "kms:*",
+          "Resource" : "*"
+        },
+        {
+          "Sid" : "Allow use of the key",
+          "Effect" : "Allow",
+          "Principal" : {
+            "AWS" : "arn:aws:iam::${var.user_account_id}:role/aws-service-role/rds.amazonaws.com/AWSServiceRoleForRDS"
+          },
+          "Action" : [
+            "kms:Encrypt",
+            "kms:Decrypt",
+            "kms:ReEncrypt*",
+            "kms:GenerateDataKey*",
+            "kms:DescribeKey"
+          ],
+          "Resource" : "*"
+        },
+        {
+          "Sid" : "Allow attachment of persistent resources",
+          "Effect" : "Allow",
+          "Principal" : {
+            "AWS" : "arn:aws:iam::${var.user_account_id}:role/aws-service-role/rds.amazonaws.com/AWSServiceRoleForRDS"
+          },
+          "Action" : [
+            "kms:CreateGrant",
+            "kms:ListGrants",
+            "kms:RevokeGrant"
+          ],
+          "Resource" : "*",
+          "Condition" : {
+            "Bool" : {
+              "kms:GrantIsForAWSResource" : "true"
+            }
+          }
+        }
+      ]
+    }
+
+  )
+}
+
+#  alias for the RDS volume
+resource "aws_kms_alias" "alias_key_rds" {
+  name          = "alias/${var.alias_rds_key}"
+  target_key_id = aws_kms_key.rds_kms_key.id
+}
+
+
 // Target group of Load Balancer
 resource "aws_lb_target_group" "alb_tg" {
 
@@ -516,12 +685,20 @@ resource "aws_lb_target_group" "alb_tg" {
 
 }
 
+data "aws_acm_certificate" "issued" {
+  domain   = var.domain_name
+  statuses = ["ISSUED"]
+}
+
+
 // Listener for Load Balancer
 resource "aws_lb_listener" "front_end" {
 
   load_balancer_arn = aws_lb.lb.arn
-  port              = "80"
-  protocol          = "HTTP"
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = data.aws_acm_certificate.issued.arn
 
   default_action {
     type             = "forward"
@@ -529,6 +706,8 @@ resource "aws_lb_listener" "front_end" {
   }
 
 }
+
+
 
 // Auto scaling policy for scale up
 resource "aws_autoscaling_policy" "scale_up_policy" {
