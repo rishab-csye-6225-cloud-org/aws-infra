@@ -234,3 +234,20 @@ variable "policy_period_scale_up" {
   default     = 60
 }
 
+variable "user_account_id" {
+  description = "account id"
+  type        = string
+  default     = "xxxx"
+}
+
+variable "alias_ebs_key" {
+  description = "alias for ebs key"
+  type        = string
+  default     = "xxxx"
+}
+
+variable "alias_rds_key" {
+  description = "alias for rds key"
+  type        = string
+  default     = "xxxx"
+}

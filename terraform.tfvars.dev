@@ -33,3 +33,6 @@ policy_evaluation_periods_scale_down  = 2
 policy_period_scale_down              = 120
 policy_evaluation_periods_scale_up = 2
 policy_period_scale_up      = 120
+user_account_id           = "059217636044"
+alias_ebs_key             = "EBScsye6225"
+alias_rds_key             = "RDScsye6225"

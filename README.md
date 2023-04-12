@@ -138,3 +138,33 @@
 8. Worked in the dev profile in order to develop the code
 9. Ran the terraform commands to run the code
 10. Created the infrastructure and tested the application using the domain name
+
+
+# Assignment 9
+
+## The assignment was to add ssl certificates for dev and prod environments, encrypt the RDS instance and EBS volumes.
+
+## Need to configure the entire infrastructure changes for ssl certificates & KMS keys
+
+## Instructions to run the Assignment
+
+1. Clone the organization's (rishab-csye-6225-cloud-org)  aws-infra (main) repository
+2. Go to the aws-infra folder first 
+    - Add the dev.tfvars or demo.tfvars file (with all the variables defined) in the root directory
+    - terraform init
+    - terraform plan -var-file="file_name.tfvars"
+    - terraform apply -var-file="file_name.tfvars"
+    - terraform destroy -var-file="file_name.tfvars"
+
+3. The command to import the certificate is as follows :
+    - aws acm import-certificate --certificate fileb://prod_rishabagarwal_me.crt --certificate-chain fileb://prod_rishabagarwal_me.ca-bundle --private-key fileb://private.key
+
+
+## Steps followed for the assignment were as follows:
+1. Wrote the code to add KMS keys for both the RDS and EBS volumes
+2. Created policies for RDS and Ebs volumes and attached it the respective keys
+3. Made changes to load balancer listener by changing the port from 80 t0 443 and the protocol from HTTP to HTTPS
+4. Added configuration for SSL certification by attaching it to the load balancer listener
+5. Worked in the dev profile in order to develop the code
+6. Ran the terraform commands to run the code
+7. Created the infrastructure and tested the application using the domain name
