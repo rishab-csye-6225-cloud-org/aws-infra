@@ -531,7 +531,7 @@ resource "aws_kms_key" "ebs_kms_key" {
             "Sid": "Allow access for Key Administrators",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::${var.user_account_id}:root"
+               "AWS": "arn:aws:iam::${var.user_account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
             },
             "Action": [
                 "kms:Create*",
@@ -620,6 +620,32 @@ resource "aws_kms_key" "rds_kms_key" {
           "Action" : "kms:*",
           "Resource" : "*"
         },
+
+        {
+          "Sid" : "Allow access for Key Administrators",
+          "Effect" : "Allow",
+          "Principal" : {
+            "AWS" : "arn:aws:iam::${var.user_account_id}:role/aws-service-role/rds.amazonaws.com/AWSServiceRoleForRDS"
+          },
+          "Action" : [
+            "kms:Create*",
+            "kms:Describe*",
+            "kms:Enable*",
+            "kms:List*",
+            "kms:Put*",
+            "kms:Update*",
+            "kms:Revoke*",
+            "kms:Disable*",
+            "kms:Get*",
+            "kms:Delete*",
+            "kms:TagResource",
+            "kms:UntagResource",
+            "kms:ScheduleKeyDeletion",
+            "kms:CancelKeyDeletion"
+          ],
+          "Resource" : "*"
+        }
+        ,
         {
           "Sid" : "Allow use of the key",
           "Effect" : "Allow",
