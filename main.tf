@@ -375,13 +375,13 @@ resource "aws_security_group" "load_balancer_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    description = "TCP traffic to port 80"
-    to_port     = 80
-    from_port   = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # ingress {
+  #   description = "TCP traffic to port 80"
+  #   to_port     = 80
+  #   from_port   = 80
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
   //for testing purpose
   egress {
@@ -605,6 +605,9 @@ resource "aws_kms_key" "rds_kms_key" {
   customer_master_key_spec = "SYMMETRIC_DEFAULT"
   enable_key_rotation      = true
   multi_region             = true
+  tags = {
+    Name = "${var.assignment} - RDS KMS Key"
+  }
   policy = jsonencode(
 
     {
